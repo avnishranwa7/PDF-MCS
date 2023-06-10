@@ -1,9 +1,24 @@
-import './App.css';
+import "./App.css";
+
+import { Home } from "./pages/Home";
+import { SignUp } from "./pages/SignUp";
+import { SignIn } from "./pages/SignIn";
+import { UploadPage } from "./pages/Upload";
+import { Navbar } from "./components/Navbar";
+import { NoPage } from "./pages/NoPage";
+import { Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
     <div className="App">
-      
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<SignIn />} />
+        <Route path="/upload" element={<UploadPage />} />
+        <Route path="*" element={<NoPage />} />
+      </Routes>
     </div>
   );
 }
