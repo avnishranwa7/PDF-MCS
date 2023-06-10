@@ -2,6 +2,9 @@ import styled from "styled-components";
 import { useState } from "react";
 import { storage } from "../firebase";
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import {useNavigate} from "react-router-dom";
+import { Unauthorized } from "./Unauthorized";
 
 import uploadIcon from "../assets/uploadIcon.svg";
 import fileIcon from "../assets/fileIcon.svg";
@@ -9,12 +12,25 @@ import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 
 export const UploadPage = () =>{
+    const [user, setUser] = useState(null);
+  
+    const auth = getAuth();
+    const navigate = useNavigate();
+
+    onAuthStateChanged(auth, (user)=>{
+        if(user){
+            setUser(user);
+            console.log(user.uid);
+        }
+        else{
+            console.log("User is not signed in");
+        }
+    });
+
     const [submitButtonClicked, setSubmitButtonClicked] = useState(false);
     const [pdfUrl, setPdfUrl] = useState("");
     const [progresspercent, setProgresspercent] = useState(0);
     const [file, setFile] = useState(null);
-
-    console.log(file);
 
     const handleFile = (e) =>{
         e.preventDefault();
@@ -45,34 +61,41 @@ export const UploadPage = () =>{
     }
 
     return(
-        <UploadDiv>
-            <h1>Upload PDF</h1>
-            {!file &&
+        <>
+            {user &&
+            <UploadDiv>
+                <h1>Upload PDF</h1>
+                {!file &&
+                    <Form>
+                        <label for="file-input">
+                            <IconButton>
+                                <img src={uploadIcon} />
+                            </IconButton>
+                        </label>
+                        <input id="file-input" type="file" accept="application/pdf" onChange={handleFile} />
+                    </Form>
+                }
+                {file &&
                 <Form>
-                    <label for="file-input">
-                        <IconButton>
-                            <img src={uploadIcon} />
-                        </IconButton>
-                    </label>
-                    <input id="file-input" type="file" accept="application/pdf" onChange={handleFile} />
+                    {submitButtonClicked && progresspercent!==100 &&
+                        <Box sx={{ width: '100%' }}>
+                            <LinearProgress />
+                        </Box>
+                    }
+                    <IconButton>
+                        <img src={fileIcon} />
+                    </IconButton>
+                    {file.name}
+                    <button class="btn btn-outline-success" onClick={handleSubmit}>Upload file</button>
                 </Form>
             }
-            {file &&
-            <Form>
-                {submitButtonClicked && progresspercent!==100 &&
-                    <Box sx={{ width: '100%' }}>
-                        <LinearProgress />
-                    </Box>
-                }
-                <IconButton>
-                    <img src={fileIcon} />
-                </IconButton>
-                {file.name}
-                <button class="btn btn-outline-success" onClick={handleSubmit}>Upload file</button>
-            </Form>
-        }
+            </UploadDiv>
+            }
 
-        </UploadDiv>
+            {!user &&
+            <Unauthorized />
+            }
+        </>
     )
 }
 

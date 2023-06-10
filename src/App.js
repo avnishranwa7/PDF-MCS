@@ -1,4 +1,5 @@
 import "./App.css";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import { Home } from "./pages/Home";
 import { SignUp } from "./pages/SignUp";
