@@ -1,0 +1,6 @@
+.MuiGrid-item{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-clamp: 2;
+    height: 7rem;
+}

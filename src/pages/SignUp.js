@@ -14,14 +14,15 @@ export const SignUp = () =>{
     const handleSignUp = () =>{
         const auth = getAuth();
         createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        .then(async (userCredential) => {
             // Signed in 
             const user = userCredential.user;
-            updateProfile(auth.currentUser, {
+            await updateProfile(auth.currentUser, {
                 displayName: name
             }).then(()=>{
                 setError("");
                 console.log("Profile updated");
+                console.log(user);
             }).catch((error)=>{
                 setError(error.message);
                 console.log(error.message);
@@ -40,7 +41,11 @@ export const SignUp = () =>{
                 case "auth/missing-password":
                     setError("Password is required");
                     break;
-            
+                
+                case "auth/weak-password":
+                    setError("Please select a strong password");
+                    break;
+
                 default:
                     break;
             }

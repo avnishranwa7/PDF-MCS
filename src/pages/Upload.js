@@ -13,28 +13,34 @@ import LinearProgress from '@mui/material/LinearProgress';
 
 export const UploadPage = () =>{
     const [user, setUser] = useState(null);
+    const [submitButtonClicked, setSubmitButtonClicked] = useState(false);
+    const [pdfUrl, setPdfUrl] = useState("");
+    const [progresspercent, setProgresspercent] = useState(0);
+    const [file, setFile] = useState(null);
   
     const auth = getAuth();
     const navigate = useNavigate();
 
-    onAuthStateChanged(auth, (user)=>{
-        if(user){
-            setUser(user);
-            console.log(user.uid);
+    onAuthStateChanged(auth, (currentUser)=>{
+        if(!user && currentUser){
+            setUser(currentUser);
         }
         else{
             console.log("User is not signed in");
         }
     });
 
-    const [submitButtonClicked, setSubmitButtonClicked] = useState(false);
-    const [pdfUrl, setPdfUrl] = useState("");
-    const [progresspercent, setProgresspercent] = useState(0);
-    const [file, setFile] = useState(null);
+    const getFileExtension = (fileName) =>{
+        return fileName.split('.').pop();
+    }
 
     const handleFile = (e) =>{
         e.preventDefault();
         if(e.target.files[0]){
+            if(getFileExtension(e.target.files[0].name).toLowerCase()!=="pdf"){
+                window.alert("Only PDF files can be uploaded");
+                return;
+            }
             setFile(e.target.files[0])
         }
     }
@@ -42,7 +48,7 @@ export const UploadPage = () =>{
     const handleSubmit = (e) =>{
         if(file){
             setSubmitButtonClicked(true);
-            const storageRef = ref(storage, `files/${file.name}`);
+            const storageRef = ref(storage, `pdfs/${file.name}`);
             const uploadTask = uploadBytesResumable(storageRef, file);
             uploadTask.on("state_changed", (snapshot)=>{
                 const progress = Math.round(snapshot.bytesTransferred / snapshot.totalBytes)*100;
@@ -93,7 +99,7 @@ export const UploadPage = () =>{
             }
 
             {!user &&
-            <Unauthorized />
+                <Unauthorized />
             }
         </>
     )

@@ -1,6 +1,7 @@
 import "./App.css";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
+import { useState } from 'react';
 import { Home } from "./pages/Home";
 import { SignUp } from "./pages/SignUp";
 import { SignIn } from "./pages/SignIn";
