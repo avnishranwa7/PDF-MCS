@@ -92,16 +92,6 @@ export const Navbar = () => {
               }
             </li>
           </ul>
-          <div class="d-flex">
-            <input
-              class="form-control me-2"
-              type="text"
-              placeholder="Search"
-            />
-            <button class="btn btn-outline-success">
-              Search
-            </button>
-          </div>
           {user &&
             <div class="btn-group">
               <button type="button" data-bs-toggle="dropdown">

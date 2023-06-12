@@ -9,6 +9,8 @@ import { UploadPage } from "./pages/Upload";
 import { Navbar } from "./components/Navbar";
 import { NoPage } from "./pages/NoPage";
 import { Routes, Route } from 'react-router-dom';
+import { Worker } from '@react-pdf-viewer/core';
+import { ViewPdf } from "./pages/ViewPdf";
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/pdf/:name/:token" element={<ViewPdf />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<SignIn />} />
         <Route path="/upload" element={<UploadPage />} />
