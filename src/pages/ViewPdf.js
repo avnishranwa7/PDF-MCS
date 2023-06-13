@@ -7,7 +7,8 @@ import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import { useParams } from 'react-router-dom';
 import packageJson from"../../package.json";
 import { useEffect } from 'react';
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, update, onValue } from "firebase/database";
+import { v4 as uuidv4 } from 'uuid';
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/toolbar/lib/styles/index.css';
@@ -17,6 +18,8 @@ import sendIcon from "../assets/sendIcon.svg";
 export const ViewPdf = () =>{
     const { name, token } = useParams();
     const [url, setUrl] = useState("");
+    const [message, setMessage] = useState("");
+    const [comments, setComments] = useState([]);
 
     const pdfjsVersion = packageJson.dependencies['pdfjs-dist'];
 
@@ -31,14 +34,38 @@ export const ViewPdf = () =>{
     const { Toolbar } = toolbarPluginInstance;
 
     const db = getDatabase();
-    const starCountRef = ref(db, 'pdfs/' + token);
+
     useEffect(()=>{
         let downloadUrl = "https://firebasestorage.googleapis.com/v0/b/pdf-management-system-278d6.appspot.com/o/pdfs%2F";
         downloadUrl += (name + ".pdf" + "?alt=media&token=" + token);
+
+        const commentRef = ref(db, 'pdfs/' + token + '/comments');
+        onValue(commentRef, (snapshot) => {
+            const data = snapshot.val();
+            if(data!=null){
+                setComments([...comments, data]);
+            }
+        });
+
         setUrl(downloadUrl);
-
-
     }, []);
+
+    const publishComment = ()=>{
+        if(message!==""){
+            const commentID = uuidv4();
+            const data = {"message": message};
+            const commentObject = {};
+            commentObject[commentID] = data;
+            update(ref(db, 'pdfs/'+token+'/comments/'), commentObject);
+            setMessage("");
+        }
+    }
+
+    const handleKeyPress = (e)=>{
+        if(e.key==='Enter'){
+            publishComment();
+        }
+    }
     
     return(
         <>
@@ -53,31 +80,19 @@ export const ViewPdf = () =>{
             <CommentSection>
                 <Heading>Comments</Heading>
                 <Comments>
-                    <CommentBox>
-                        AAAAAAAAAAAAAAAAAAAAAAAAAA
-                    </CommentBox>
-                    <CommentBox>
-                        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-                    </CommentBox>
-                    <CommentBox>
-                        AAAAAAAAA
-                    </CommentBox>
-                    <CommentBox>
-                        AAAAAAAAAA
-                    </CommentBox>
-                    <CommentBox>
-                        AA
-                    </CommentBox>
-                    <CommentBox>
-                        AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-                    </CommentBox>
-                    <CommentBox>
-                        AAAAAAAAAAAAAAAAAAAAAAAAAAAA
-                    </CommentBox>
+                    {
+                        comments.map((comm, index)=>
+                            Object.values(comm).map((commentMessage)=>(
+                                <CommentBox id={index}>
+                                    {commentMessage.message}
+                                </CommentBox>
+                            ))
+                        )
+                    }
                 </Comments>
                 <CommentPad>
-                    <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Type your comment..." />
-                    <img src={sendIcon} />
+                    <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="Type your comment..." value={message} onChange={(e)=>setMessage(e.target.value)} onKeyUp={handleKeyPress}/>
+                    <img src={sendIcon} onClick={publishComment} />
                 </CommentPad>
             </CommentSection>
         </PDFPage>
@@ -105,6 +120,7 @@ const Comments = styled.div`
     align-items: flex-end;
     padding: 0.5rem;
     overflow-y: scroll;
+    height: 100%;
 `
 
 const CommentPad = styled.div`

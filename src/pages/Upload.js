@@ -5,7 +5,7 @@ import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import {useNavigate} from "react-router-dom";
 import { Unauthorized } from "./Unauthorized";
-import { getDatabase, ref as dbRef, onValue, set, update } from "firebase/database";
+import { getDatabase, ref as dbRef, update } from "firebase/database";
 
 import uploadIcon from "../assets/uploadIcon.svg";
 import fileIcon from "../assets/fileIcon.svg";

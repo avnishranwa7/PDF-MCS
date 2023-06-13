@@ -38,7 +38,6 @@ export const Home = () =>{
     const handleOpen = (name, token) =>{
         navigate('/pdf/'+name+'/'+token);
     }
-    const handleClose = () => setOpen(false);
 
     const handleSearchChange = (e)=>{
         setSearchQuery(e.target.value);

@@ -25,6 +25,7 @@
     "react-router-dom": "^6.12.1",
     "react-scripts": "5.0.1",
     "styled-components": "^5.3.11",
+    "uuid": "^9.0.0",
     "web-vitals": "^2.1.4",
     "webpack-dev-middleware": "^6.1.1"
   },
