@@ -5,6 +5,7 @@ import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import {useNavigate} from "react-router-dom";
 import { Unauthorized } from "./Unauthorized";
+import { getDatabase, ref as dbRef, onValue, set, update } from "firebase/database";
 
 import uploadIcon from "../assets/uploadIcon.svg";
 import fileIcon from "../assets/fileIcon.svg";
@@ -45,6 +46,15 @@ export const UploadPage = () =>{
         }
     }
 
+    const extractTokenFromUrl = (url) =>{
+        const regex = /token=([^&]+)/;
+        const match = String(url).match(regex);
+        if (match && match.length >= 2) {
+            return match[1];
+        }
+        return "";
+    }
+
     const handleSubmit = (e) =>{
         if(file){
             setSubmitButtonClicked(true);
@@ -58,6 +68,13 @@ export const UploadPage = () =>{
             }, ()=>{
                 setSubmitButtonClicked(false);
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL)=>{
+                    const db = getDatabase();
+                    const token = extractTokenFromUrl(downloadURL);
+                    const data = {"uploadedBy": user.uid};
+                    const jsonObject = {};
+                    jsonObject[token] = data;
+                    console.log(jsonObject);
+                    update(dbRef(db, 'pdfs/'), jsonObject);
                     setPdfUrl(downloadURL);
                     setProgresspercent("");
                     setFile(null);

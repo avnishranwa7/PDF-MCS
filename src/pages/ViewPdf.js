@@ -7,6 +7,7 @@ import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import { useParams } from 'react-router-dom';
 import packageJson from"../../package.json";
 import { useEffect } from 'react';
+import { getDatabase, ref, set } from "firebase/database";
 
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/toolbar/lib/styles/index.css';
@@ -29,10 +30,14 @@ export const ViewPdf = () =>{
     });
     const { Toolbar } = toolbarPluginInstance;
 
+    const db = getDatabase();
+    const starCountRef = ref(db, 'pdfs/' + token);
     useEffect(()=>{
         let downloadUrl = "https://firebasestorage.googleapis.com/v0/b/pdf-management-system-278d6.appspot.com/o/pdfs%2F";
         downloadUrl += (name + ".pdf" + "?alt=media&token=" + token);
         setUrl(downloadUrl);
+
+
     }, []);
     
     return(
@@ -58,7 +63,7 @@ export const ViewPdf = () =>{
                         AAAAAAAAA
                     </CommentBox>
                     <CommentBox>
-                        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                        AAAAAAAAAA
                     </CommentBox>
                     <CommentBox>
                         AA
